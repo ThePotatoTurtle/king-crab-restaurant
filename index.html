@@ -23,6 +23,10 @@ var cv=document.getElementById('c'), ctx=cv.getContext('2d');
 var W=960,H=600,DPR=1;
 var FONT='"Comic Sans MS","Chalkboard SE","Comic Neue",cursive';
 var INK='#20180f';
+/* bump this on every deploy. shown on the title screen so you can tell at a glance
+   whether a host is serving a stale cached copy. also readable from the console. */
+var BUILD='build 3 - steady lines';
+window.BUILD=BUILD;
 
 function resize(){
   DPR=Math.min(2,window.devicePixelRatio||1);
@@ -459,6 +463,7 @@ scenes.title={
     txt('mouse + left click. that is the whole game.',W/2,540,16,'#3c5a66');
     if(G.runs>0)txt('career earnings: '+money(G.career)+'   ('+G.runs+' crab'+(G.runs>1?'s':'')+')',W/2,568,15,'#3c5a66');
     txt('M = mute',W-56,24,14,'#3c5a66');
+    txt(BUILD,14,H-14,13,'#7d9ead','left');
   }
 };
 
