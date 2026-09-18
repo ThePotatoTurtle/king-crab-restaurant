@@ -76,7 +76,10 @@ function sfxSplash(){noise(.35,.1,2600);}
 function sfxClick(){tone(760,.04,'square',.045);}
 
 /* ---- wobble drawing ---- */
-var WSEED=0,T=0,FRAME=0,WOB=2.4,WSC=1;
+var WSEED=0,T=0,FRAME=0,WOB=1.5,WSC=1;
+/* how often the wobble reseeds, in seconds. time-based so the boil looks the
+   same at 60Hz and 120Hz. lower = jitterier. */
+var WOBT=0,WOBRATE=0.2;
 function nz(a){var n=Math.sin(a*127.1+WSEED*311.7)*43758.5453;return n-Math.floor(n)-0.5;}
 function jx(x,y,i){return nz(x*0.31+y*0.17+i*3.77)*2*WOB*WSC;}
 function jy(x,y,i){return nz(x*0.53+y*0.29+i*5.13+91.7)*2*WOB*WSC;}
@@ -211,7 +214,7 @@ function drawCrab(x,y,s,o){
   var legA=[-0.10,0.16,0.42,0.68];
   for(side=-1;side<=1;side+=2){
     for(i=0;i<4;i++){
-      var a=legA[i], ph=t*5.2+i*1.0+(side>0?0.7:0);
+      var a=legA[i], ph=t*2.6+i*1.0+(side>0?0.7:0);
       var x0=side*30, y0=-10+i*7;
       var d1=a-0.95+Math.sin(ph)*0.14*wig;
       var x1=x0+side*Math.cos(d1)*36, y1=y0+Math.sin(d1)*36;
@@ -225,11 +228,11 @@ function drawCrab(x,y,s,o){
   }
   /* claws */
   for(side=-1;side<=1;side+=2){
-    var sw=Math.sin(t*3.1+(side>0?1.6:0))*(o.angry?10:5)*wig;
+    var sw=Math.sin(t*1.7+(side>0?1.6:0))*(o.angry?10:5)*wig;
     var ax=side*24, ay=-8;
     var ex=ax+side*44, ey=ay-30+sw;
     ln([[ax,ay],[ax+side*30,ay-22+sw*0.5],[ex,ey]],dark,11);
-    pincer(ex,ey,side,(Math.sin(t*4+side*1.7)*0.5+0.5)*(o.angry?1:0.6),body,dark,-0.55);
+    pincer(ex,ey,side,(Math.sin(t*2.2+side*1.7)*0.5+0.5)*(o.angry?1:0.6),body,dark,-0.55);
   }
   /* carapace */
   var bp=[];
@@ -242,7 +245,7 @@ function drawCrab(x,y,s,o){
   var lx=0,ly=0;
   if(o.look){var dx=o.look[0]-x,dy=o.look[1]-y,m=Math.hypot(dx,dy)||1;lx=dx/m*3.2;ly=dy/m*3.2;}
   for(side=-1;side<=1;side+=2){
-    var sx=side*15, sy=-26, tx2=sx+side*10, ty2=sy-20-Math.sin(t*4+side)*2;
+    var sx=side*15, sy=-26, tx2=sx+side*10, ty2=sy-20-Math.sin(t*2+side)*2;
     ln([[sx,sy],[tx2,ty2]],dark,5);
     circ(tx2,ty2,10,'#fffdf5',4);
     circ(tx2+lx,ty2+ly,4.4,INK,0);
@@ -291,7 +294,7 @@ function drawPotCage(x,y,full){
 function drawTruck(x,y,t,o){
   o=o||{};
   ctx.save();ctx.translate(x,y);
-  var wob=Math.sin(t*22)*1.2+(o.bump||0);
+  var wob=Math.sin(t*10)*1.0+(o.bump||0);
   ctx.translate(0,wob);
   /* tank trailer */
   rct(-150,-92,190,84,'#cfe9f5',5);
@@ -319,15 +322,15 @@ function drawPerson(x,y,s,o){
   o=o||{};
   var t=(o.t===undefined?T:o.t),_w=WSC;WSC=WSC/s;
   ctx.save();ctx.translate(x,y);ctx.scale(s,s);
-  var bob=Math.sin(t*(o.walk?9:2))*(o.walk?3:1.5);
+  var bob=Math.sin(t*(o.walk?6:1.6))*(o.walk?3:1.5);
   ctx.translate(0,bob);
   /* legs */
-  var sw=o.walk?Math.sin(t*9)*14:0;
+  var sw=o.walk?Math.sin(t*6)*14:0;
   ln([[0,0],[-9+sw,34]],INK,6); ln([[0,0],[9-sw,34]],INK,6);
   /* body */
   shape([[-20,-52],[20,-52],[16,2],[-16,2]],o.shirt||'#4f86c6',5);
   /* arms */
-  var aw=o.wave?Math.sin(t*7)*22:0;
+  var aw=o.wave?Math.sin(t*4)*22:0;
   ln([[-18,-44],[-34,-16+aw]],INK,6);
   ln([[18,-44],[34+(o.point?10:0),(o.point?-40:-16)-aw]],INK,6);
   /* head */
@@ -384,7 +387,7 @@ function drawTree(x,y,s){
   ctx.restore();WSC=_w;
 }
 function drawGull(x,y,t){
-  var f=Math.sin(t*6)*12;
+  var f=Math.sin(t*3.5)*12;
   ln([[x-18,y+f],[x,y],[x+18,y+f]],INK,3.5);
 }
 function cursorClaw(){
@@ -532,7 +535,7 @@ scenes.ocean={
     }
     for(i=0;i<5;i++)ell(110+i*190,SEA_BED+16,42,18,'#b9a173',4);
     /* surface line */
-    var wv=[];for(i=0;i<=24;i++)wv.push([i*40,SEA_TOP+Math.sin(i*0.8+T*2)*5]);
+    var wv=[];for(i=0;i<=24;i++)wv.push([i*40,SEA_TOP+Math.sin(i*0.8+T*1.2)*5]);
     ln(wv,'#1d6d8f',5);
     drawBubbles(140,SEA_BED-30,6,1,20,0.4);
     drawBubbles(760,SEA_BED-30,6,3,20,0.35);
@@ -670,8 +673,8 @@ scenes.truck={
     /* obstacles */
     for(i=0;i<TR.obs.length;i++)drawObs(TR.obs[i]);
     /* truck */
-    ctx.save();if(TR.inv>0&&Math.floor(T*22)%2)ctx.globalAlpha=0.45;
-    drawTruck(TX,452+TR.y,T,{crab:true,bump:TR.inv>0?Math.sin(T*40)*3:0});
+    ctx.save();if(TR.inv>0&&Math.floor(T*11)%2)ctx.globalAlpha=0.45;
+    drawTruck(TX,452+TR.y,T,{crab:true,bump:TR.inv>0?Math.sin(T*18)*3:0});
     ctx.restore();
     /* hud */
     hudBar('THE HAUL  ~  Alaska to Vancouver');
@@ -710,7 +713,7 @@ function drawObs(o){
     txt('moo',-20,-110,16,'#20180f');
     ctx.restore();
   } else if(o.k==='goose'){
-    ctx.save();ctx.translate(x,ROAD-2+Math.sin(o.ph*7)*4);
+    ctx.save();ctx.translate(x,ROAD-2+Math.sin(o.ph*4)*4);
     ell(0,-22,26,17,'#fffdf5',4);ln([[16,-34],[20,-56]],'#fffdf5',9);
     circ(21,-60,11,'#fffdf5',4);shape([[30,-60],[44,-56],[30,-52]],'#f08a24',3);
     circ(25,-63,2.6,INK,0);ln([[-10,-6],[-8,-2]],'#f08a24',4);
@@ -745,7 +748,7 @@ scenes.tank={
       } else {
         if(M.press&&Math.hypot(M.x-c.x,M.y-c.y)<80){TK.grab=true;sfxClick();}
         if(TK.grab){
-          var tx=M.x+Math.sin(T*9)*13,ty=M.y+Math.cos(T*11)*11;
+          var tx=M.x+Math.sin(T*5.5)*13,ty=M.y+Math.cos(T*6.5)*11;
           c.x+=(tx-c.x)*Math.min(1,dt*11);c.y+=(ty-c.y)*Math.min(1,dt*11);
           if(M.rel){
             TK.grab=false;
@@ -802,7 +805,7 @@ scenes.tank={
     /* crab */
     var gr=TK.grab;
     drawCrab(TK.crab.x,TK.crab.y,0.62,{crown:true,angry:gr||TK.loose>0,wig:gr?2.2:1,
-      look:[M.x,M.y],rot:gr?Math.sin(T*12)*0.12:0});
+      look:[M.x,M.y],rot:gr?Math.sin(T*6.5)*0.12:0});
     /* customer */
     if(TK.state==='order'){
       drawPerson(TK.cust,H-150,1.0,{hat:'top',shirt:'#3b3b5c',point:true,happy:false});
@@ -850,8 +853,8 @@ scenes.kitchen={
     if(KT.state==='grab'){
       if(M.press&&Math.hypot(M.x-c.x,M.y-c.y)<80){KT.grab=true;sfxClick();}
       if(KT.grab){
-        c.x+=(M.x+Math.sin(T*10)*12-c.x)*Math.min(1,dt*12);
-        c.y+=(M.y+Math.cos(T*12)*10-c.y)*Math.min(1,dt*12);
+        c.x+=(M.x+Math.sin(T*5.5)*12-c.x)*Math.min(1,dt*12);
+        c.y+=(M.y+Math.cos(T*6.5)*10-c.y)*Math.min(1,dt*12);
         if(M.rel){
           KT.grab=false;
           if(Math.hypot(c.x-POTX,c.y-POTY)<120){
@@ -908,7 +911,7 @@ scenes.kitchen={
     /* flame */
     var fl=0.22+KT.flame*0.78;
     for(i=-2;i<=2;i++){
-      var fh=(42+Math.sin(T*18+i)*14)*fl;
+      var fh=(42+Math.sin(T*8+i)*14)*fl;
       shape([[POTX+i*26-12,POTY+98],[POTX+i*26,POTY+98-fh],[POTX+i*26+12,POTY+98]],
         KT.flame>0.4?'#ff9a1f':'#f0621f',0);
       shape([[POTX+i*26-6,POTY+98],[POTX+i*26,POTY+98-fh*0.55],[POTX+i*26+6,POTY+98]],'#ffe9a8',0);
@@ -933,7 +936,7 @@ scenes.kitchen={
     /* crab */
     if(KT.state==='grab'){
       drawCrab(KT.crab.x,KT.crab.y,0.6,{crown:true,angry:KT.grab,wig:KT.grab?2.2:1,
-        look:[M.x,M.y],rot:KT.grab?Math.sin(T*13)*0.13:0});
+        look:[M.x,M.y],rot:KT.grab?Math.sin(T*7)*0.13:0});
     } else if(KT.state==='cook'){
       ctx.save();ctx.beginPath();ctx.rect(0,0,W,POTY-38);ctx.clip();
       drawCrab(KT.crab.x,KT.crab.y,0.6,{crown:true,cooked:KT.done>34,angry:true,
@@ -1097,7 +1100,7 @@ scenes.payday={
     ctx.save();ctx.translate(W/2,96);ctx.scale(sc,sc);ctx.rotate(Math.sin(T*2.4)*0.02);
     txt('KA-CHING',0,0,60,'#ffd93d','center',0,INK);
     ctx.restore();
-    txt(money(PD.shown),W/2,178,78,'#fffdf5','center',Math.sin(T*5)*0.012,INK);
+    txt(money(PD.shown),W/2,178,78,'#fffdf5','center',Math.sin(T*2.4)*0.012,INK);
     txt('PROFIT, THIS EVENING',W/2,228,20,'#c9f0d4');
     drawPerson(108,H-30,1.2,{hat:'chef',shirt:'#fffdf5',wave:true,happy:true});
     drawCrab(W-104,H-104+Math.sin(T*2)*6,0.6,{crown:true,cooked:true,wig:0.6,t:T});
@@ -1129,7 +1132,7 @@ var last=0;
 function frame(ts){
   var dt=Math.min(0.05,(ts-last)/1000||0);last=ts;
   T+=dt;FRAME++;st+=dt;
-  if(FRAME%4===0)WSEED=(WSEED+1)%101;
+  WOBT+=dt; if(WOBT>=WOBRATE){WOBT-=WOBRATE;WSEED=(WSEED+1)%101;}
   if(trans===1){wipe+=dt*3.6;if(wipe>=1){wipe=1;setScene(pend);trans=2;}}
   else if(trans===2){wipe-=dt*3.6;if(wipe<=0){wipe=0;trans=0;}}
   else scenes[scene].update(dt);
