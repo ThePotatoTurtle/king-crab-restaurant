@@ -5,23 +5,28 @@ A dumb little browser game. One crab, one supply chain, one obscene payday.
 ## Constraints
 - Single self-contained `index.html`. No build step, no dependencies, no assets.
 - All art drawn procedurally on `<canvas>`: thick wobbly black outlines, flat fills,
-  colouring offset outside the lines. Lines re-jitter 15x/sec ("boiling" squigglevision).
+  colouring offset outside the lines. Lines re-jitter 5x/sec ("boiling" squigglevision),
+  on a time-based clock so the boil looks the same at any refresh rate.
   Font: Comic Sans MS.
 - Controls: mouse move, hold/release left click, drag. `M` mutes. Nothing else.
-- ~2 minutes start to finish. No fail state — mistakes cost cash and dignity only.
+- ~2 minutes start to finish. Real fail states: any failure restarts the entire
+  chain from the boat in Alaska, never from the scene that was failed.
 - Hosted on GitHub Pages.
 
 ## The chain (6 scenes)
 
-| # | Scene | Verb | Control | Soft fail |
-|---|-------|------|---------|-----------|
+| # | Scene | Verb | Control | Cost of failure |
+|---|-------|------|---------|-----------------|
 | 0 | TITLE | click | click | — |
-| 1 | ALASKA | catch the king crab | mouse X steers boat, HOLD to lower the pot | catch a boot / duck / tire / lesser crab: -$, keep fishing |
-| 2 | THE HAUL | drive to Vancouver | click to hop potholes & moose | bonk: crab sloshes, FRESHNESS drops |
-| 3 | THE TANK | crab into tank | drag | drop it, it scuttles off and insults you |
-| 4 | THE KITCHEN | boil it | HOLD to keep the flame on, release in the green | RAW (still waving) / CHARCOAL |
-| 5 | SERVICE | serve the plate | drag to the table | smash the plate |
+| 1 | ALASKA | catch the king crab | mouse X steers boat, HOLD to lower the pot | junk: −$300 and lost seconds. **15s daylight clock → RESTART** |
+| 2 | THE HAUL | drive to Richmond | click to hop potholes & moose | bonk: **−20% freshness**. **0% → RESTART** |
+| 3 | THE TANK | bucket into tank | drag | drop it: −$200 and lost seconds. **10s freshness clock → RESTART** |
+| 4 | THE KITCHEN | boil it | HOLD to keep the flame on, release in the green | **RAW or CHARCOAL → RESTART** |
+| 5 | SERVICE | serve the plate | drag to the table | **smash the plate → RESTART** |
 | 6 | PAYDAY | exist | click | — |
+
+Every RESTART returns to scene 1. The ALASKA clock doubles as a day/night cycle:
+the sky ramps morning → sunset → night across its 15 seconds.
 
 ## Money
 ```

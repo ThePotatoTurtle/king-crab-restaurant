@@ -1,11 +1,14 @@
 # 🦀 KING CRAB RESTAURANT SIMULATOR
 
 An extremely serious supply chain experience. Catch a crab in Alaska, truck it to
-Vancouver, put it in a tank, boil it, serve it, retire.
+Richmond, put it in a tank, boil it, serve it, retire.
 
 **Play it:** https://thepotatoturtle.github.io/king-crab-restaurant/
 
-About two minutes. One crab. No way to lose, only ways to be embarrassed.
+About two minutes. One crab. Plenty of ways to lose it.
+
+Any failure sends you back to the boat in Alaska and restarts the whole chain --
+there is no scene-by-scene retry.
 
 ## Controls
 
@@ -13,11 +16,11 @@ Mouse and left click. That's the whole game.
 
 | Scene | What to do |
 |---|---|
-| **Alaska** | Move the mouse to steer the boat. **Hold left click** to lower the pot. Catch the one wearing a crown — everything else costs you money. |
-| **The Haul** | **Left click** to hop potholes, moose and geese. Bonking the truck sloshes the crab and drops its freshness. |
-| **The Tank** | **Click and drag** the crab into the tank. Drop it and it will scuttle off and say something hurtful. |
-| **The Kitchen** | Drag the crab into the pot, then **hold left click** to keep the flame on. Release in the green band. |
-| **Service** | Drag the plate to the customer. Don't drop the plate. |
+| **Alaska** | Steer the boat with the mouse, **hold left click** to lower the pot. Catch the one wearing a crown — everything else costs you $300 and precious time. **15 seconds of daylight**; the sky darkens as it runs out and nightfall ends the run. |
+| **The Haul** | **Left click** to hop potholes, moose and geese. Each bonk costs **20% freshness** — five crashes and the crab is a smoothie. |
+| **The Tank** | **Click and drag** the crab out of the bucket and into the tank. Freshness drains fast — a full bar gives you **10 seconds**. Drop the crab and it scuttles off, costing cash and seconds you don't have. |
+| **The Kitchen** | Drag the crab into the pot, then **hold left click** to keep the flame on. Release in the green band — **raw or burnt ends the run**. |
+| **Service** | Drag the plate to the customer. **Dropping it ends the run.** |
 | **Payday** | Sit back. |
 
 `M` mutes the sound. Career earnings are saved in your browser.
