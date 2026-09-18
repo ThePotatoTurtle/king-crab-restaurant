@@ -81,6 +81,9 @@ var WSEED=0,T=0,FRAME=0,WOB=1.5,WSC=1;
    same at 60Hz and 120Hz. lower = jitterier. */
 var WOBT=0,WOBRATE=0.2;
 function nz(a){var n=Math.sin(a*127.1+WSEED*311.7)*43758.5453;return n-Math.floor(n)-0.5;}
+/* static twin of nz: same look, but does NOT change with WSEED. used for anything
+   that should hold still (fill offsets, text tilt) rather than boil. */
+function nzf(a){var n=Math.sin(a*91.7+17.33)*43758.5453;return n-Math.floor(n)-0.5;}
 function jx(x,y,i){return nz(x*0.31+y*0.17+i*3.77)*2*WOB*WSC;}
 function jy(x,y,i){return nz(x*0.53+y*0.29+i*5.13+91.7)*2*WOB*WSC;}
 
@@ -97,9 +100,14 @@ function subdiv(pts,close,step){
 }
 function trace(pts,close,step){
   var p=subdiv(pts,close,(step||26)*WSC);
+  /* wobble is keyed to each point's offset from the shape's OWN first point, never
+     its world position. otherwise anything that moves re-rolls its wobble every
+     frame and shimmers violently instead of boiling at WOBRATE. */
+  var ox=p[0][0],oy=p[0][1];
   ctx.beginPath();
   for(var i=0;i<p.length;i++){
-    var x=p[i][0]+jx(p[i][0],p[i][1],i),y=p[i][1]+jy(p[i][0],p[i][1],i);
+    var rx=p[i][0]-ox,ry=p[i][1]-oy;
+    var x=p[i][0]+jx(rx,ry,i),y=p[i][1]+jy(rx,ry,i);
     if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);
   }
   if(close)ctx.closePath();
@@ -113,8 +121,11 @@ function shape(pts,fill,lw,close,stroke,step){
     var i,x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
     for(i=0;i<pts.length;i++){x0=Math.min(x0,pts[i][0]);x1=Math.max(x1,pts[i][0]);
       y0=Math.min(y0,pts[i][1]);y1=Math.max(y1,pts[i][1]);}
-    var cap=Math.min(4.6*WSC,Math.max(x1-x0,y1-y0)*0.11);
-    var ox=nz(pts[0][0]*0.7+pts.length)*2*cap,oy=nz(pts[0][1]*0.9+13)*2*cap;
+    var cap=Math.min(3.2*WSC,Math.max(x1-x0,y1-y0)*0.085);
+    /* translation-invariant signature, so the offset depends on the shape's form
+       rather than where it happens to be on screen */
+    var sig=(x1-x0)*0.7+(y1-y0)*1.3+pts.length*5.1+(pts[0][0]-x0)*0.31;
+    var ox=nzf(sig)*2*cap,oy=nzf(sig+37.7)*2*cap;
     ctx.save();ctx.translate(ox,oy);trace(pts,true,step);ctx.fillStyle=fill;ctx.fill();ctx.restore();
   }
   if(lw>0){trace(pts,close,step);ctx.strokeStyle=stroke||INK;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();}
@@ -179,7 +190,7 @@ function drawFX(){
     ctx.restore();}
   for(i=0;i<pops.length;i++){var q=pops[i];
     ctx.save();ctx.globalAlpha=Math.max(0,1-Math.max(0,q.t-1)/0.7);
-    txt(q.s,q.x,q.y,q.z,q.c,'center',nz(q.x)*0.12,'#fff');ctx.restore();}
+    txt(q.s,q.x,q.y,q.z,q.c,'center',nzf(q.x)*0.12,'#fff');ctx.restore();}
 }
 
 /* ---- screen shake ---- */

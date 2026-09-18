@@ -40,6 +40,22 @@ deliberately drawn a few pixels off from their outlines so everything looks like
 was coloured in by someone in a hurry.
 
 The wobble is scale-aware (`WSC`), so a crab drawn at 3x doesn't get 3x the wobble.
+It is also keyed to each point's offset from its own shape's origin rather than to
+world position, so a shape that moves across the screen keeps its wobble instead of
+re-rolling it every frame. Fill offsets use a separate static noise function
+(`nzf`) so the colour sits still while only the outline boils.
+
+### Dialling the wobble
+
+Three numbers near the top of the script:
+
+| | what it does | calmer | wilder |
+|---|---|---|---|
+| `WOBRATE` | seconds between reseeds of the line boil | `0.3` | `0.1` |
+| `WOB` | line wobble amplitude in px | `1.0` | `2.5` |
+| `cap` in `shape()` | how far fills sit off their outlines | `2.0` | `5.0` |
+
+`WOBRATE` is in seconds, not frames, so the boil looks identical at 60Hz and 240Hz.
 
 ## Layout
 
