@@ -25,7 +25,7 @@ var FONT='"Comic Sans MS","Chalkboard SE","Comic Neue",cursive';
 var INK='#20180f';
 /* bump this on every deploy. shown on the title screen so you can tell at a glance
    whether a host is serving a stale cached copy. also readable from the console. */
-var BUILD='build 7';
+var BUILD='build 8';
 window.BUILD=BUILD;
 
 function resize(){
@@ -103,7 +103,7 @@ function musHit(t,dur,vol,lp,d){
   sc.connect(f);f.connect(g);g.connect(d);sc.start(t);sc.stop(t+dur);
 }
 var TRACKS=[
-  { sname:'SEA SHANTY', stepSec:0.168, len:24, trim:3.6,
+  { sname:'SEA SHANTY', stepSec:0.168, len:24, trim:3.24,
     play:function(i,t,d){
       var bar=Math.floor(i/6), b=i%6;
       var r=[38,38,43,45][bar], q=[[0,3,7],[0,3,7],[0,3,7],[0,4,7]][bar];
@@ -113,7 +113,7 @@ var TRACKS=[
       var mel=[74,0,76,77,0,76, 74,0,72,74,0,0, 77,0,79,81,0,79, 77,0,76,74,0,0];
       if(mel[i]) musNote(mtof(mel[i]),t,0.2,'square',0.085,d);
     }},
-  { sname:'CORPORATE LOUNGE', stepSec:0.30, len:32, trim:1.21,
+  { sname:'CORPORATE LOUNGE', stepSec:0.30, len:32, trim:1.33,
     play:function(i,t,d){
       var bar=Math.floor(i/8), b=i%8, k;
       var r=[36,33,38,43][bar];
