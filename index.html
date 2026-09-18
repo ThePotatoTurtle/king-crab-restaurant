@@ -671,7 +671,7 @@ var BONKS=['THE CRAB HAS OPINIONS','SLOSH','FRESHNESS -','IT HIT ITS LITTLE HEAD
   'THE CRAB IS FILING A COMPLAINT','TURBULENCE','CRAB WENT FLYING','OW (crab)'];
 var SIGNS=['ALASKA - thanks for the crab','BORDER: DECLARE YOUR CRAB','YUKON (mostly)',
   '1800 km TO RICHMOND','MOOSE XING - they know','LAST GAS FOR 400 km','FREE CRAB? no.',
-  'RICHMOND 12 km','PLEASE DRIVE SANELY'];
+  'RICHMOND 12 km','PLEASE DRIVE SANELY','WELCOME TO RICHMOND'];
 scenes.truck={
   init:function(){
     TR.d=0;TR.y=0;TR.vy=0;TR.ground=true;TR.obs=[];TR.next=1.6;TR.inv=0;
@@ -710,7 +710,9 @@ scenes.truck={
         }
       }
       TR.nsign-=dt;
-      if(TR.nsign<=0){TR.nsign=2.5;TR.signs.push({x:W+80,s:SIGNS[TR.si%SIGNS.length]});TR.si++;}
+      /* run the list once and stop - wrapping put the Alaska sign back on the
+         outskirts of Richmond */
+      if(TR.nsign<=0&&TR.si<SIGNS.length){TR.nsign=2.5;TR.signs.push({x:W+80,s:SIGNS[TR.si]});TR.si++;}
       for(i=TR.signs.length-1;i>=0;i--){TR.signs[i].x-=SC*dt;if(TR.signs[i].x<-320)TR.signs.splice(i,1);}
       if(TR.d>=100){TR.state='arrive';st=0;}
     } else {
@@ -1013,20 +1015,21 @@ scenes.kitchen={
     drawGlassTank(KTANK.x,KTANK.y,KTANK.w,KTANK.h,0.86);
     drawBubbles(KTANK.x+40,KTANK.y+KTANK.h-14,5,2,14,0.9);
     /* stove */
-    rct(POTX-160,POTY+80,320,130,'#9aa3ab',5);
-    rct(POTX-142,POTY+118,124,72,'#7d868e',4);
-    circ(POTX+96,POTY+128,20,'#e0e4e8',4);circ(POTX+96,POTY+128,5,'#e23b2e',0);
-    ln([[POTX-92,POTY+76],[POTX+92,POTY+76]],'#4b5158',6);
+    rct(POTX-160,POTY+82,320,130,'#9aa3ab',5);
+    rct(POTX-142,POTY+120,124,72,'#7d868e',4);
+    circ(POTX+96,POTY+130,20,'#e0e4e8',4);circ(POTX+96,POTY+130,5,'#e23b2e',0);
+    ln([[POTX-104,POTY+78],[POTX+104,POTY+78]],'#4b5158',6);
     /* flame */
     var fl=0.22+KT.flame*0.78;
-    for(i=-2;i<=2;i++){
-      var fh=(30+Math.sin(T*8+i)*10)*fl;
-      shape([[POTX+i*26-12,POTY+74],[POTX+i*26,POTY+74-fh],[POTX+i*26+12,POTY+74]],
+    /* 7 tongues spanning wider than the pot base, so flame licks past its sides */
+    for(i=-3;i<=3;i++){
+      var fh=(34+Math.sin(T*8+i)*11)*fl;
+      shape([[POTX+i*31-13,POTY+76],[POTX+i*31,POTY+76-fh],[POTX+i*31+13,POTY+76]],
         KT.flame>0.4?'#ff9a1f':'#f0621f',0);
-      shape([[POTX+i*26-6,POTY+74],[POTX+i*26,POTY+74-fh*0.55],[POTX+i*26+6,POTY+74]],'#ffe9a8',0);
+      shape([[POTX+i*31-6,POTY+76],[POTX+i*31,POTY+76-fh*0.55],[POTX+i*31+6,POTY+76]],'#ffe9a8',0);
     }
     /* pot */
-    shape([[POTX-104,POTY-44],[POTX+104,POTY-44],[POTX+86,POTY+52],[POTX-86,POTY+52]],'#5c6168',6);
+    shape([[POTX-104,POTY-44],[POTX+104,POTY-44],[POTX+86,POTY+64],[POTX-86,POTY+64]],'#5c6168',6);
     ell(POTX,POTY-44,104,20,'#3d4249',5);
     ln([[POTX-104,POTY-38],[POTX-130,POTY-14],[POTX-100,POTY+6]],INK,6);
     ln([[POTX+104,POTY-38],[POTX+130,POTY-14],[POTX+100,POTY+6]],INK,6);
@@ -1115,7 +1118,7 @@ scenes.serve={
     flat(0,0,W,120,'#8a4a3a');ln([[0,120],[W,120]],INK,5);
     flat(0,H-140,W,140,'#a9703f');ln([[0,H-140],[W,H-140]],'#7b4c26',5);
     for(var i=0;i<8;i++)ln([[i*130,H-140],[i*130,H]],'#8a5a30',3);
-    txt('SANBO CHINESE RESTAURANT',W/2,64,27,'#ffd93d');
+    txt('SANBO CHINESE RESTAURANT',W/2,78,27,'#ffd93d');
     /* pass counter */
     rct(80,440,220,120,'#cfd6c8',5);
     txt('PASS',190,470,20,'#5a6a52');

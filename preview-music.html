@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crab Soundtrack Auditions</title>
+<style>
+  :root{ --ink:#20180f; --paper:#fdf6e3; --red:#e23b2e; --gold:#ffd93d; --sea:#7fd4f0; }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Comic Sans MS","Chalkboard SE","Comic Neue",cursive}
+  .wrap{max-width:760px;margin:0 auto;padding:32px 16px 64px}
+  h1{font-size:34px;margin:0 0 4px;color:var(--red);transform:rotate(-1deg)}
+  .sub{font-size:15px;color:#6b5a3e;margin:0 0 26px}
+  .card{border:4px solid var(--ink);border-radius:10px;background:#fff;
+    padding:16px 18px;margin:0 0 18px;box-shadow:5px 6px 0 rgba(32,24,15,.18)}
+  .card h2{font-size:22px;margin:0 0 2px}
+  .vibe{font-size:14px;color:#5c5142;margin:0 0 14px;line-height:1.45}
+  .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:17px;font-weight:bold;cursor:pointer;
+    border:4px solid var(--ink);border-radius:8px;background:#fff6c9;
+    padding:9px 20px;transition:transform .05s}
+  button:hover{background:var(--gold)}
+  button:active{transform:translate(2px,2px)}
+  button.on{background:var(--red);color:#fff}
+  .meta{font-size:13px;color:#8a7a5a}
+  .bars{display:flex;gap:3px;align-items:flex-end;height:26px}
+  .bars i{width:5px;background:var(--sea);border:1.5px solid var(--ink);height:4px;
+    display:block;border-radius:2px}
+  .vol{margin:22px 0 0;font-size:14px;color:#5c5142}
+  input[type=range]{width:220px;vertical-align:middle}
+  .note{margin-top:30px;padding:14px 16px;border:3px dashed #b3a184;border-radius:8px;
+    font-size:13.5px;color:#5c5142;line-height:1.6}
+  code{background:#f1ead6;padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🦀 Soundtrack auditions</h1>
+  <p class="sub">Three original loops, written in code — no audio files, nothing to license.
+     Click one to hear it. The slider is set to the level it would sit at in-game.</p>
+
+  <div id="cards"></div>
+
+  <p class="vol">Volume <input id="vol" type="range" min="0" max="100" value="18">
+     <span id="volnum" class="meta">18% — in-game background level</span></p>
+
+  <div class="note">
+    These are synthesised live in the browser from note data, the same way every
+    graphic in the game is drawn from code. That keeps the whole thing one
+    self-contained <code>index.html</code> with no binary assets and no attribution
+    requirements. If you'd rather have real recorded music, say so — that needs a
+    downloaded file plus a credit line in the README, and I'd want your go-ahead first.
+  </div>
+</div>
+
+<script>
+"use strict";
+var AC=null, VOL=0.18, playing=null, timer=null;
+function ac(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)();
+  if(AC.state==='suspended')AC.resume(); return AC; }
+function mtof(n){ return 440*Math.pow(2,(n-69)/12); }
+
+function note(f,t,dur,type,vol,dest){
+  var o=AC.createOscillator(), g=AC.createGain();
+  o.type=type; o.frequency.setValueAtTime(f,t);
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(vol,t+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+  o.connect(g); g.connect(dest); o.start(t); o.stop(t+dur+0.03);
+}
+var NB=null;
+function hit(t,dur,vol,lp,dest){
+  if(!NB){ NB=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);
+    var d=NB.getChannelData(0); for(var i=0;i<d.length;i++) d[i]=Math.random()*2-1; }
+  var s=AC.createBufferSource(); s.buffer=NB; s.loop=true;
+  var g=AC.createGain(), f=AC.createBiquadFilter();
+  f.type='lowpass'; f.frequency.value=lp;
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+  s.connect(f); f.connect(g); g.connect(dest); s.start(t); s.stop(t+dur);
+}
+
+/* ------------------------------------------------------------- tracks ---- */
+var TRACKS={
+
+  shanty:{
+    name:'1 — SEA SHANTY',
+    vibe:'Jaunty 6/8 oom-pah with an accordion and a whistled tune. Drunk fishermen ' +
+         'energy. Leans into the Alaska half of the game and stays funny in the kitchen.',
+    stepSec:0.168, len:24, trim:3.6,
+    play:function(i,t,d){
+      var bar=Math.floor(i/6), b=i%6;
+      var roots=[38,38,43,45], r=roots[bar];
+      var qual=[[0,3,7],[0,3,7],[0,3,7],[0,4,7]][bar];
+      if(b===0||b===3) note(mtof(r),t,0.24,'triangle',0.30,d);
+      else note(mtof(r+7),t,0.12,'triangle',0.11,d);
+      if(b===1||b===4) for(var k=0;k<3;k++) note(mtof(r+12+qual[k]),t,0.15,'sawtooth',0.05,d);
+      var mel=[74,0,76,77,0,76, 74,0,72,74,0,0, 77,0,79,81,0,79, 77,0,76,74,0,0];
+      if(mel[i]) note(mtof(mel[i]),t,0.2,'square',0.085,d);
+    }
+  },
+
+  lounge:{
+    name:'2 — CORPORATE LOUNGE',
+    vibe:'Slow hold-music jazz over Cmaj7–Am7–Dm7–G7. Plays the whole thing dead ' +
+         'straight, which is the joke. Pairs with the receipt and the "market price" gag.',
+    stepSec:0.30, len:32, trim:0.72,
+    play:function(i,t,d){
+      var bar=Math.floor(i/8), b=i%8;
+      var roots=[36,33,38,43];
+      var qual=[[0,4,7,11],[0,3,7,10],[0,3,7,10],[0,4,7,10]];
+      var r=roots[bar], q=qual[bar], k;
+      if(b===0) note(mtof(r),t,0.95,'sine',0.26,d);
+      if(b===4) note(mtof(r+7),t,0.5,'sine',0.15,d);
+      if(b===0||b===4) for(k=0;k<4;k++) note(mtof(r+24+q[k]),t,0.8,'triangle',0.045,d);
+      if(b===2||b===6) hit(t,0.05,0.035,5000,d);
+      var mel=[0,79,0,76,0,74,0,0, 0,76,0,72,0,0,0,0,
+               0,77,0,74,0,72,0,0, 0,74,0,71,0,0,0,0];
+      if(mel[i]) note(mtof(mel[i]),t,0.45,'sine',0.10,d);
+    }
+  },
+
+  hustle:{
+    name:'3 — CHIPTUNE HUSTLE',
+    vibe:'Fast driving 8-bit in A minor, with a kick and snare. Most game-like of the ' +
+         'three and pushes you along — best fit for the truck run and the new timers.',
+    stepSec:0.107, len:32, trim:0.55,
+    play:function(i,t,d){
+      var bass=[45,0,45,0,45,0,48,0, 43,0,43,0,43,0,45,0,
+                41,0,41,0,41,0,43,0, 43,0,45,0,47,0,47,0];
+      if(bass[i]) note(mtof(bass[i]-12),t,0.11,'square',0.22,d);
+      var arp=[[57,60,64],[55,59,62],[53,57,60],[55,59,62]][Math.floor(i/8)];
+      note(mtof(arp[i%3]),t,0.07,'square',0.05,d);
+      if(i%8===0) note(52,t,0.13,'sine',0.34,d);
+      if(i%8===4) hit(t,0.09,0.10,2600,d);
+      if(i%2===1) hit(t,0.02,0.018,9000,d);
+    }
+  }
+};
+
+/* ---------------------------------------------------------- scheduler ---- */
+var step=0, nextT=0, master=null, cur=null;
+function startTrack(key){
+  stopTrack();
+  ac();
+  cur=TRACKS[key];
+  master=AC.createGain(); master.gain.value=VOL*(cur.trim||1); master.connect(AC.destination);
+  step=0; nextT=AC.currentTime+0.08;
+  timer=setInterval(function(){
+    if(!cur)return;
+    while(nextT < AC.currentTime+0.15){
+      cur.play(step%cur.len, nextT, master);
+      nextT += cur.stepSec;
+      step++;
+    }
+  },25);
+  playing=key;
+  paint();
+}
+function stopTrack(){
+  if(timer){clearInterval(timer);timer=null;}
+  if(master){try{master.gain.setTargetAtTime(0,AC.currentTime,0.03);}catch(e){}
+    var m=master; setTimeout(function(){try{m.disconnect();}catch(e){}},400); master=null;}
+  cur=null; playing=null; paint();
+}
+
+/* ------------------------------------------------------------- the UI ---- */
+var wrap=document.getElementById('cards');
+Object.keys(TRACKS).forEach(function(key){
+  var tr=TRACKS[key];
+  var c=document.createElement('div'); c.className='card';
+  c.innerHTML='<h2>'+tr.name+'</h2><p class="vibe">'+tr.vibe+'</p>'+
+    '<div class="row"><button data-k="'+key+'">PLAY</button>'+
+    '<div class="bars" id="b-'+key+'"></div>'+
+    '<span class="meta">loops every '+(tr.stepSec*tr.len).toFixed(1)+'s</span></div>';
+  wrap.appendChild(c);
+  var bars=c.querySelector('.bars');
+  for(var i=0;i<14;i++) bars.appendChild(document.createElement('i'));
+});
+wrap.addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b)return;
+  var k=b.getAttribute('data-k');
+  if(playing===k) stopTrack(); else startTrack(k);
+});
+function paint(){
+  wrap.querySelectorAll('button').forEach(function(b){
+    var on=b.getAttribute('data-k')===playing;
+    b.classList.toggle('on',on); b.textContent=on?'STOP':'PLAY';
+  });
+}
+var vol=document.getElementById('vol'), volnum=document.getElementById('volnum');
+vol.addEventListener('input',function(){
+  VOL=+vol.value/100;
+  volnum.textContent=vol.value+'%'+(vol.value==18?' — in-game background level':'');
+  if(master) master.gain.setTargetAtTime(VOL*((cur&&cur.trim)||1),AC.currentTime,0.05);
+});
+/* little dancing bars so you can see which one is running */
+setInterval(function(){
+  Object.keys(TRACKS).forEach(function(k){
+    var el=document.getElementById('b-'+k);
+    el.querySelectorAll('i').forEach(function(n,j){
+      n.style.height = (playing===k ? (4+Math.abs(Math.sin(Date.now()/150+j))*20) : 4)+'px';
+    });
+  });
+},60);
+</script>
+</body>
+</html>
