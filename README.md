@@ -27,10 +27,10 @@ Mouse and left click. That's the whole game.
 
 ## Music
 
-Three original loops — **Sea Shanty**, **Corporate Lounge** and **Chiptune Hustle** —
-synthesised live from note data, same as the graphics are drawn from code. One is
-picked at random each time the page loads, and its name shows next to the build
-marker on the title screen. No audio files, so nothing to license or attribute.
+Two original loops — **Sea Shanty** and **Corporate Lounge** — synthesised live from
+note data, same as the graphics are drawn from code. One is picked at random each
+time the page loads, and its name shows next to the build marker on the title
+screen. No audio files, so nothing to license or attribute.
 
 Per-track `trim` values level them against each other; `MUS.vol` sets the overall
 background level.

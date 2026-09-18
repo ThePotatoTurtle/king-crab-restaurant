@@ -9,7 +9,7 @@ A dumb little browser game. One crab, one supply chain, one obscene payday.
   on a time-based clock so the boil looks the same at any refresh rate.
   Font: Comic Sans MS.
 - Controls: mouse move, hold/release left click, drag. `M` mutes (sfx + music). Nothing else.
-- Soundtrack: three loops synthesised from note data, one picked at random per load.
+- Soundtrack: two loops synthesised from note data, one picked at random per load.
   No audio files anywhere in the project.
 - ~2 minutes start to finish. Real fail states: any failure restarts the entire
   chain from the boat in Alaska, never from the scene that was failed.

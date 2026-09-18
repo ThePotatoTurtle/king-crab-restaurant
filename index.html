@@ -25,7 +25,7 @@ var FONT='"Comic Sans MS","Chalkboard SE","Comic Neue",cursive';
 var INK='#20180f';
 /* bump this on every deploy. shown on the title screen so you can tell at a glance
    whether a host is serving a stale cached copy. also readable from the console. */
-var BUILD='build 5';
+var BUILD='build 6';
 window.BUILD=BUILD;
 
 function resize(){
@@ -80,7 +80,7 @@ function sfxBonk(){noise(.14,.16,700);tone(90,.14,'square',.08,-40);}
 function sfxSplash(){noise(.35,.1,2600);}
 function sfxClick(){tone(760,.04,'square',.045);}
 
-/* ---- soundtrack: three loops, one picked at random each page load ---------
+/* ---- soundtrack: two loops, one picked at random each page load -----------
    Synthesised from note data, same as the art is drawn from code: no files.
    `trim` levels the tracks against each other so whichever one comes up sits
    at the same background volume. */
@@ -125,17 +125,6 @@ var TRACKS=[
       var mel=[0,79,0,76,0,74,0,0, 0,76,0,72,0,0,0,0,
                0,77,0,74,0,72,0,0, 0,74,0,71,0,0,0,0];
       if(mel[i]) musNote(mtof(mel[i]),t,0.45,'sine',0.10,d);
-    }},
-  { sname:'CHIPTUNE HUSTLE', stepSec:0.107, len:32, trim:0.83,
-    play:function(i,t,d){
-      var bass=[45,0,45,0,45,0,48,0, 43,0,43,0,43,0,45,0,
-                41,0,41,0,41,0,43,0, 43,0,45,0,47,0,47,0];
-      if(bass[i]) musNote(mtof(bass[i]-12),t,0.11,'square',0.22,d);
-      var arp=[[57,60,64],[55,59,62],[53,57,60],[55,59,62]][Math.floor(i/8)];
-      musNote(mtof(arp[i%3]),t,0.07,'square',0.05,d);
-      if(i%8===0) musNote(52,t,0.13,'sine',0.34,d);
-      if(i%8===4) musHit(t,0.09,0.10,2600,d);
-      if(i%2===1) musHit(t,0.02,0.018,9000,d);
     }}
 ];
 var MUSPICK=Math.floor(Math.random()*TRACKS.length);
