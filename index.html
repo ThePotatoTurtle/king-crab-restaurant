@@ -25,7 +25,7 @@ var FONT='"Comic Sans MS","Chalkboard SE","Comic Neue",cursive';
 var INK='#20180f';
 /* bump this on every deploy. shown on the title screen so you can tell at a glance
    whether a host is serving a stale cached copy. also readable from the console. */
-var BUILD='build 4 - sanbo';
+var BUILD='build 5';
 window.BUILD=BUILD;
 
 function resize(){
@@ -46,13 +46,14 @@ cv.addEventListener('contextmenu',function(e){e.preventDefault();});
 cv.addEventListener('touchstart',function(e){e.preventDefault();var t=e.changedTouches[0];mpos(t.clientX,t.clientY);M.down=true;M.press=true;audioInit();},{passive:false});
 cv.addEventListener('touchmove',function(e){e.preventDefault();var t=e.changedTouches[0];mpos(t.clientX,t.clientY);},{passive:false});
 cv.addEventListener('touchend',function(e){e.preventDefault();M.down=false;M.rel=true;},{passive:false});
-window.addEventListener('keydown',function(e){ if(e.key==='m'||e.key==='M'){muted=!muted;} });
+window.addEventListener('keydown',function(e){ if(e.key==='m'||e.key==='M'){muted=!muted;musSync();} });
 
 /* ---- audio ---- */
 var AC=null,muted=false;
 function audioInit(){
   if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}
   if(AC&&AC.state==='suspended')AC.resume();
+  musStart();
 }
 function tone(f,d,type,v,slide){
   if(!AC||muted)return; d=d||0.1; v=v||0.06;
@@ -78,6 +79,83 @@ function sfxBad(){tone(180,.28,'sawtooth',.07,-120);}
 function sfxBonk(){noise(.14,.16,700);tone(90,.14,'square',.08,-40);}
 function sfxSplash(){noise(.35,.1,2600);}
 function sfxClick(){tone(760,.04,'square',.045);}
+
+/* ---- soundtrack: three loops, one picked at random each page load ---------
+   Synthesised from note data, same as the art is drawn from code: no files.
+   `trim` levels the tracks against each other so whichever one comes up sits
+   at the same background volume. */
+function mtof(n){return 440*Math.pow(2,(n-69)/12);}
+function musNote(f,t,dur,type,vol,d){
+  var o=AC.createOscillator(),g=AC.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,t);
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(vol,t+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+  o.connect(g);g.connect(d);o.start(t);o.stop(t+dur+0.03);
+}
+function musHit(t,dur,vol,lp,d){
+  if(!nbuf){nbuf=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);var dd=nbuf.getChannelData(0);
+    for(var i=0;i<dd.length;i++)dd[i]=Math.random()*2-1;}
+  var sc=AC.createBufferSource();sc.buffer=nbuf;sc.loop=true;
+  var g=AC.createGain(),f=AC.createBiquadFilter();
+  f.type='lowpass';f.frequency.value=lp;
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+  sc.connect(f);f.connect(g);g.connect(d);sc.start(t);sc.stop(t+dur);
+}
+var TRACKS=[
+  { sname:'SEA SHANTY', stepSec:0.168, len:24, trim:3.6,
+    play:function(i,t,d){
+      var bar=Math.floor(i/6), b=i%6;
+      var r=[38,38,43,45][bar], q=[[0,3,7],[0,3,7],[0,3,7],[0,4,7]][bar];
+      if(b===0||b===3) musNote(mtof(r),t,0.24,'triangle',0.30,d);
+      else musNote(mtof(r+7),t,0.12,'triangle',0.11,d);
+      if(b===1||b===4) for(var k=0;k<3;k++) musNote(mtof(r+12+q[k]),t,0.15,'sawtooth',0.05,d);
+      var mel=[74,0,76,77,0,76, 74,0,72,74,0,0, 77,0,79,81,0,79, 77,0,76,74,0,0];
+      if(mel[i]) musNote(mtof(mel[i]),t,0.2,'square',0.085,d);
+    }},
+  { sname:'CORPORATE LOUNGE', stepSec:0.30, len:32, trim:1.01,
+    play:function(i,t,d){
+      var bar=Math.floor(i/8), b=i%8, k;
+      var r=[36,33,38,43][bar];
+      var q=[[0,4,7,11],[0,3,7,10],[0,3,7,10],[0,4,7,10]][bar];
+      if(b===0) musNote(mtof(r),t,0.95,'sine',0.26,d);
+      if(b===4) musNote(mtof(r+7),t,0.5,'sine',0.15,d);
+      if(b===0||b===4) for(k=0;k<4;k++) musNote(mtof(r+24+q[k]),t,0.8,'triangle',0.045,d);
+      if(b===2||b===6) musHit(t,0.05,0.035,5000,d);
+      var mel=[0,79,0,76,0,74,0,0, 0,76,0,72,0,0,0,0,
+               0,77,0,74,0,72,0,0, 0,74,0,71,0,0,0,0];
+      if(mel[i]) musNote(mtof(mel[i]),t,0.45,'sine',0.10,d);
+    }},
+  { sname:'CHIPTUNE HUSTLE', stepSec:0.107, len:32, trim:0.83,
+    play:function(i,t,d){
+      var bass=[45,0,45,0,45,0,48,0, 43,0,43,0,43,0,45,0,
+                41,0,41,0,41,0,43,0, 43,0,45,0,47,0,47,0];
+      if(bass[i]) musNote(mtof(bass[i]-12),t,0.11,'square',0.22,d);
+      var arp=[[57,60,64],[55,59,62],[53,57,60],[55,59,62]][Math.floor(i/8)];
+      musNote(mtof(arp[i%3]),t,0.07,'square',0.05,d);
+      if(i%8===0) musNote(52,t,0.13,'sine',0.34,d);
+      if(i%8===4) musHit(t,0.09,0.10,2600,d);
+      if(i%2===1) musHit(t,0.02,0.018,9000,d);
+    }}
+];
+var MUSPICK=Math.floor(Math.random()*TRACKS.length);
+var MUS={track:null,step:0,next:0,timer:null,gain:null,vol:0.18};
+function musLevel(){return muted?0:MUS.vol*(MUS.track?MUS.track.trim:1);}
+function musStart(){
+  if(!AC||MUS.timer)return;
+  MUS.track=TRACKS[MUSPICK];
+  MUS.gain=AC.createGain();MUS.gain.gain.value=musLevel();MUS.gain.connect(AC.destination);
+  MUS.step=0;MUS.next=AC.currentTime+0.1;
+  MUS.timer=setInterval(function(){
+    if(!AC||!MUS.track)return;
+    /* schedule a little ahead of the clock so timing does not depend on frames */
+    while(MUS.next<AC.currentTime+0.15){
+      MUS.track.play(MUS.step%MUS.track.len,MUS.next,MUS.gain);
+      MUS.next+=MUS.track.stepSec;MUS.step++;
+    }
+  },25);
+}
+function musSync(){ if(MUS.gain&&AC) MUS.gain.gain.setTargetAtTime(musLevel(),AC.currentTime,0.05); }
 
 /* ---- wobble drawing ---- */
 var WSEED=0,T=0,FRAME=0,WOB=1.5,WSC=1;
@@ -514,7 +592,7 @@ scenes.title={
     txt('mouse + left click. that is the whole game.',W/2,540,16,'#3c5a66');
     if(G.runs>0)txt('career earnings: '+money(G.career)+'   ('+G.runs+' crab'+(G.runs>1?'s':'')+')',W/2,568,15,'#3c5a66');
     txt('M = mute',W-56,24,14,'#3c5a66');
-    txt(BUILD,14,H-14,13,'#7d9ead','left');
+    txt(BUILD+'  ~  '+TRACKS[MUSPICK].sname,14,H-14,13,'#7d9ead','left');
   }
 };
 
@@ -675,13 +753,13 @@ var SIGNS=['ALASKA - thanks for the crab','BORDER: DECLARE YOUR CRAB','YUKON (mo
 scenes.truck={
   init:function(){
     TR.d=0;TR.y=0;TR.vy=0;TR.ground=true;TR.obs=[];TR.next=1.6;TR.inv=0;
-    TR.scroll=0;TR.signs=[];TR.nsign=1.2;TR.si=0;TR.state='drive';TR.banner=2.6;TR.hits=0;
+    TR.scroll=0;TR.signs=[];TR.nsign=0.8;TR.si=0;TR.state='drive';TR.banner=2.6;TR.hits=0;
   },
   update:function(dt){
-    var SC=320,i,o;
+    var SC=400,i,o;   /* 25% quicker than the original 320 */
     if(TR.banner>0)TR.banner-=dt;
     if(TR.state==='drive'){
-      TR.d+=dt*(100/24);
+      TR.d+=dt*(100/19.2);
       TR.scroll+=SC*dt;
       if(M.press&&TR.ground){TR.vy=-760;TR.ground=false;tone(520,.12,'square',.06,220);}
       TR.vy+=1600*dt;TR.y+=TR.vy*dt;
@@ -689,7 +767,7 @@ scenes.truck={
       if(TR.inv>0)TR.inv-=dt;
       TR.next-=dt;
       if(TR.next<=0&&TR.d<96){
-        TR.next=1.15+Math.random()*0.9;
+        TR.next=1.0+Math.random()*0.8;
         var kinds=['hole','moose','goose','hole','cone'];
         TR.obs.push({x:W+120,k:kinds[Math.floor(Math.random()*kinds.length)],ph:Math.random()*6});
       }
@@ -712,11 +790,11 @@ scenes.truck={
       TR.nsign-=dt;
       /* run the list once and stop - wrapping put the Alaska sign back on the
          outskirts of Richmond */
-      if(TR.nsign<=0&&TR.si<SIGNS.length){TR.nsign=2.5;TR.signs.push({x:W+80,s:SIGNS[TR.si]});TR.si++;}
+      if(TR.nsign<=0&&TR.si<SIGNS.length){TR.nsign=1.85;TR.signs.push({x:W+80,s:SIGNS[TR.si]});TR.si++;}
       for(i=TR.signs.length-1;i>=0;i--){TR.signs[i].x-=SC*dt;if(TR.signs[i].x<-320)TR.signs.splice(i,1);}
       if(TR.d>=100){TR.state='arrive';st=0;}
     } else {
-      TR.scroll+=Math.max(0,320-st*300)*dt;
+      TR.scroll+=Math.max(0,400-st*370)*dt;
       TR.y+=TR.vy*dt;TR.vy+=1750*dt;if(TR.y>0){TR.y=0;TR.vy=0;}
       if(st>2.2)go('tank');
     }
@@ -825,8 +903,8 @@ scenes.tank={
     var c=TK.crab;
     if(TK.banner>0)TK.banner-=dt;
     if(TK.state==='carry'){
-      /* a full bar drains in 10s. arrive bruised from the road and you get less. */
-      G.freshness-=10*dt;
+      /* a full bar drains in 15s. arrive bruised from the road and you get less. */
+      G.freshness-=(100/15)*dt;
       if(G.freshness<=0){
         G.freshness=0;
         bust('THE CRAB DRIED OUT','ten seconds out of the water. that is all it had.');
@@ -1118,7 +1196,7 @@ scenes.serve={
     flat(0,0,W,120,'#8a4a3a');ln([[0,120],[W,120]],INK,5);
     flat(0,H-140,W,140,'#a9703f');ln([[0,H-140],[W,H-140]],'#7b4c26',5);
     for(var i=0;i<8;i++)ln([[i*130,H-140],[i*130,H]],'#8a5a30',3);
-    txt('SANBO CHINESE RESTAURANT',W/2,78,27,'#ffd93d');
+    txt('SANBO CHINESE RESTAURANT',W/2,88,27,'#ffd93d');
     /* pass counter */
     rct(80,440,220,120,'#cfd6c8',5);
     txt('PASS',190,470,20,'#5a6a52');

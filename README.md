@@ -18,12 +18,22 @@ Mouse and left click. That's the whole game.
 |---|---|
 | **Alaska** | Steer the boat with the mouse, **hold left click** to lower the pot. Catch the one wearing a crown — everything else costs you $300 and precious time. **15 seconds of daylight**; the sky darkens as it runs out and nightfall ends the run. |
 | **The Haul** | **Left click** to hop potholes, moose and geese. Each bonk costs **20% freshness** — five crashes and the crab is a smoothie. |
-| **The Tank** | **Click and drag** the crab out of the bucket and into the tank. Freshness drains fast — a full bar gives you **10 seconds**. Drop the crab and it scuttles off, costing cash and seconds you don't have. |
+| **The Tank** | **Click and drag** the crab out of the bucket and into the tank. Freshness drains fast — a full bar gives you **15 seconds**. Drop the crab and it scuttles off, costing cash and seconds you don't have. |
 | **The Kitchen** | Drag the crab into the pot, then **hold left click** to keep the flame on. Release in the green band — **raw or burnt ends the run**. |
 | **Service** | Drag the plate to the customer. **Dropping it ends the run.** |
 | **Payday** | Sit back. |
 
-`M` mutes the sound. Career earnings are saved in your browser.
+`M` mutes everything, music included. Career earnings are saved in your browser.
+
+## Music
+
+Three original loops — **Sea Shanty**, **Corporate Lounge** and **Chiptune Hustle** —
+synthesised live from note data, same as the graphics are drawn from code. One is
+picked at random each time the page loads, and its name shows next to the build
+marker on the title screen. No audio files, so nothing to license or attribute.
+
+Per-track `trim` values level them against each other; `MUS.vol` sets the overall
+background level.
 
 ## Running it locally
 

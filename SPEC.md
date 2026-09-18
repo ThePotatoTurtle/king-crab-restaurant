@@ -8,7 +8,9 @@ A dumb little browser game. One crab, one supply chain, one obscene payday.
   colouring offset outside the lines. Lines re-jitter 5x/sec ("boiling" squigglevision),
   on a time-based clock so the boil looks the same at any refresh rate.
   Font: Comic Sans MS.
-- Controls: mouse move, hold/release left click, drag. `M` mutes. Nothing else.
+- Controls: mouse move, hold/release left click, drag. `M` mutes (sfx + music). Nothing else.
+- Soundtrack: three loops synthesised from note data, one picked at random per load.
+  No audio files anywhere in the project.
 - ~2 minutes start to finish. Real fail states: any failure restarts the entire
   chain from the boat in Alaska, never from the scene that was failed.
 - Hosted on GitHub Pages.
@@ -19,8 +21,8 @@ A dumb little browser game. One crab, one supply chain, one obscene payday.
 |---|-------|------|---------|-----------------|
 | 0 | TITLE | click | click | — |
 | 1 | ALASKA | catch the king crab | mouse X steers boat, HOLD to lower the pot | junk: −$300 and lost seconds. **15s daylight clock → RESTART** |
-| 2 | THE HAUL | drive to Richmond | click to hop potholes & moose | bonk: **−20% freshness**. **0% → RESTART** |
-| 3 | THE TANK | bucket into tank | drag | drop it: −$200 and lost seconds. **10s freshness clock → RESTART** |
+| 2 | THE HAUL | drive to Richmond (19.2s) | click to hop potholes & moose | bonk: **−20% freshness**. **0% → RESTART** |
+| 3 | THE TANK | bucket into tank | drag | drop it: −$200 and lost seconds. **15s freshness clock → RESTART** |
 | 4 | THE KITCHEN | boil it | HOLD to keep the flame on, release in the green | **RAW or CHARCOAL → RESTART** |
 | 5 | SERVICE | serve the plate | drag to the table | **smash the plate → RESTART** |
 | 6 | PAYDAY | exist | click | — |
